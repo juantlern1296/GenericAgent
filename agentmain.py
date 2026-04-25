@@ -42,6 +42,8 @@ def get_system_prompt():
     prompt += f"\nToday: {time.strftime('%Y-%m-%d %a')}\n"
     # Also include the current working directory so the agent knows where it's operating from
     prompt += f"Working directory: {os.getcwd()}\n"
+    # Include hostname so I can tell which machine the agent is running on
+    prompt += f"Hostname: {os.uname().nodename}\n" if hasattr(os, 'uname') else ""
     prompt += get_global_memory()
     return prompt
 
@@ -50,8 +52,4 @@ class GeneraticAgent:
         script_dir = os.path.dirname(os.path.abspath(__file__))
         os.makedirs(os.path.join(script_dir, 'temp'), exist_ok=True)
         from llmcore import mykeys
-        llm_sessions = []
-        for k, cfg in mykeys.items():
-            if not any(x in k for x in ['api', 'config', 'cookie']): continue
-            try:
-                if 'native' in k and 'claude' in k: llm_sessions += [NativeToolClient(NativeClaudeSession(cfg=cfg))
+      
